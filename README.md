@@ -1,10 +1,17 @@
 ```sh
-ocrc parse https://arxiv.org/pdf/2310.11453 --out /home/user/bitnetseries/1
-ocrc parse https://arxiv.org/pdf/2402.17764 --out /home/user/bitnetseries/2
-ocrc parse https://arxiv.org/pdf/2410.16144 --out /home/user/bitnetseries/3
-ocrc parse https://arxiv.org/pdf/2411.04965 --out /home/user/bitnetseries/4
-ocrc parse https://arxiv.org/pdf/2502.11880 --out /home/user/bitnetseries/5
+ocrc parse https://arxiv.org/pdf/2310.11453 --out /home/user/bitnetseries/1 && \
+ocrc parse https://arxiv.org/pdf/2402.17764 --out /home/user/bitnetseries/2 && \
+ocrc parse https://arxiv.org/pdf/2410.16144 --out /home/user/bitnetseries/3 && \
+ocrc parse https://arxiv.org/pdf/2411.04965 --out /home/user/bitnetseries/4 && \
+ocrc parse https://arxiv.org/pdf/2502.11880 --out /home/user/bitnetseries/5 && \
 ocrc parse https://arxiv.org/pdf/2504.12285 --out /home/user/bitnetseries/6
+
+wget -O /home/user/bitnetseries/1.pdf https://arxiv.org/pdf/2310.11453 && \
+wget -O /home/user/bitnetseries/2.pdf https://arxiv.org/pdf/2402.17764 && \
+wget -O /home/user/bitnetseries/3.pdf https://arxiv.org/pdf/2410.16144 && \
+wget -O /home/user/bitnetseries/4.pdf https://arxiv.org/pdf/2411.04965 && \
+wget -O /home/user/bitnetseries/5.pdf https://arxiv.org/pdf/2502.11880 && \
+wget -O /home/user/bitnetseries/6.pdf https://arxiv.org/pdf/2504.12285
 ```
 
 <div align="center">
