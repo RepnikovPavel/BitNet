@@ -8,6 +8,11 @@
 > `RepnikovPavel/llama.cpp@bitnet-ffn-relu2-fix`. All pins (code, weights,
 > test data, sha256) are in [manifests/weights.json](manifests/weights.json).
 
+**Where the model lives in the source** (shortest reading path):
+- `3rdparty/llama.cpp/src/models/bitnet.cpp` — the whole BitNet model, ~180 lines: tensor layout at line 13 (`load_arch_tensors`), graph at line 52 (`graph::graph`), attention at line 98, the FFN at line 128 with the fixed `LLM_FFN_RELU_SQR` activation at line 133.
+- `src/ggml-bitnet-mad.cpp` — the I2_S (1.58-bit) quantized GEMM/GEMV kernels (`QK_I2_S` at line 12, quantizer at line 51).
+- `src/ggml-bitnet-lut.cpp` — the TL1/TL2 lookup-table kernels.
+
 One button per task (Docker, `/mnt` from the host is mounted into the container).
 Models and test data never live in the project dir: weights go to
 `/mnt/nvme/bitnetmodels/`, test data to `/mnt/nvme/bitnetdata/`
