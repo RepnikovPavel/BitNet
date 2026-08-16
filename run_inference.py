@@ -33,6 +33,10 @@ def run_inference():
     ]
     if args.conversation:
         command.append("-cnv")
+    # the new llama-cli enables interactive mode whenever a chat template is
+    # present and then busy-loops on stdin EOF; --single-turn makes the
+    # classic one-shot `run_inference.py -p ...` invocation terminate
+    command.append("--single-turn")
     run_command(command)
 
 def signal_handler(sig, frame):

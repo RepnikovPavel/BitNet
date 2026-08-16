@@ -1,0 +1,35 @@
+{
+  "weights": {
+    "name": "BitNet-b1.58-2B-4T (I2_S GGUF, ternary)",
+    "hf_repo": "microsoft/bitnet-b1.58-2B-4T-gguf",
+    "hf_revision": "a1f2f1c765812aa8af3f6eda4a313707064bba15",
+    "file": "ggml-model-i2_s.gguf",
+    "size_bytes": 1187801280,
+    "sha256": "4221b252fdd5fd25e15847adfeb5ee88886506ba50b8a34548374492884c2162",
+    "download_url": "https://huggingface.co/microsoft/bitnet-b1.58-2B-4T-gguf/resolve/a1f2f1c765812aa8af3f6eda4a313707064bba15/ggml-model-i2_s.gguf",
+    "verified": "2026-08-16: sha256 matches HF LFS oid; all 332 tensors inspected non-zero; loads as arch 'bitnet-b1.58'; coherent output with the ReLU^2 FFN fix",
+    "note": "the older revision 9f43072f6949 serves a 1844472032-byte file with legacy arch 'bitnet-25' which current code cannot load (github_mirror/issues/000608.md claims about zeroed tensors were disproved by direct inspection of BOTH files)"
+  },
+  "code": {
+    "this_fork": "RepnikovPavel/BitNet, branch deepbench",
+    "llama_cpp_submodule": {
+      "url": "https://github.com/RepnikovPavel/llama.cpp.git",
+      "branch": "bitnet-ffn-relu2-fix",
+      "base_upstream": "isHuangXin/llama.cpp@390c307752ab78fd8189f359d6954c9ba1be74af",
+      "fix": "bitnet: use ReLU^2 in FFN instead of SiLU (microsoft/BitNet issues #588, #602)"
+    },
+    "webui_assets": {
+      "hf_bucket": "ggml-org/llama-ui",
+      "pinned_version": "b9918",
+      "note": "default derived version b9919 returns 404; b9918 exists and is sha256-verified by cmake"
+    }
+  },
+  "test_data": {
+    "wikitext2_test_parquet": {
+      "url": "https://huggingface.co/datasets/Salesforce/wikitext/resolve/main/wikitext-2-raw-v1/test-00000-of-00001.parquet",
+      "size_bytes": 732610,
+      "sha256": "5f1bea067869d04849c0f975a2b29c4ff47d867f484f5010ea5e861eab246d91",
+      "note": "converted to data/wiki.test.raw (plain text) for llama-perplexity"
+    }
+  }
+}

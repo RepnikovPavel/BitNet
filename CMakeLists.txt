@@ -39,7 +39,13 @@ endif()
 find_package(Threads REQUIRED)
 
 add_subdirectory(src)
-set(LLAMA_BUILD_SERVER ON CACHE BOOL "Build llama.cpp server" FORCE)
+# the server webui assets are downloaded from a HF bucket at build time;
+# the default version derived from the build number (b9919) does not exist,
+# so pin the closest existing one (override with -DHF_UI_VERSION=... or env)
+if (NOT DEFINED ENV{HF_UI_VERSION})
+    set(ENV{HF_UI_VERSION} "b9918")
+endif()
+option(LLAMA_BUILD_SERVER "Build llama.cpp server" ON)
 add_subdirectory(3rdparty/llama.cpp)
 
 # install
