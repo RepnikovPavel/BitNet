@@ -37,8 +37,8 @@ T1=$(date +%s.%N)
 E1="$(rapl_read)"
 echo "$LOG" > "results/bench_gen_${HOST}.log"
 
-TG="$(echo "$LOG" | grep -oE 'eval time.*' | tail -1)"
-echo "$TG" | tee -a "$OUT"
+TG="$(echo "$LOG" | grep -oE '\[ Prompt: [^]]*\]' | tail -1 || true)"
+echo "speed: $TG" | tee -a "$OUT"
 
 WATTS="N/A (RAPL unreadable: run as root or use --privileged docker)"
 if [[ -n "$E0" && -n "$E1" ]]; then

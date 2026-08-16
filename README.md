@@ -1,3 +1,58 @@
+# Fork status: fixed inference, one-button build, measured benchmarks
+
+> This fork (branch `deepbench`) fixes the broken upstream master: degenerate
+> repetitive output was caused by a hardcoded SiLU in the BitNet FFN instead of
+> ReLU^2 (upstream issues [#588](github_mirror/issues/000588.md) /
+> [#602](github_mirror/issues/000602.md)), plus a rotten webui-assets download
+> that broke the default build. Fixes live in the pinned submodule
+> `RepnikovPavel/llama.cpp@bitnet-ffn-relu2-fix`. All pins (code, weights,
+> test data, sha256) are in [manifests/weights.json](manifests/weights.json).
+
+One button per task (Docker, `/mnt` from the host is mounted into the container):
+
+```sh
+scripts/build.sh                 # build / rebuild (incremental)
+scripts/download_data.sh         # pinned weights + wikitext-2 test set (sha256-verified)
+scripts/test_accuracy.sh         # perplexity on wikitext-2
+scripts/benchmark.sh             # speed / power / degeneration probes
+scripts/probe_context.sh         # max adequate context probe (needle test)
+scripts/compare_with_demo.sh     # diff local answers vs the online demo
+scripts/docker_run.sh <cmd>      # run anything inside the build container
+```
+
+## Table 1 — model quality metrics (BitNet b1.58 2B-4T, ternary; binary BitNet from the papers)
+
+| Metric | Binary BitNet (paper 1, 6.7B, W1A8) | Ternary BitNet b1.58 2B-4T (paper 6) | This fork, measured |
+|---|---|---|---|
+| Perplexity (wikitext-2) | 17.07 (FP16 baseline: 15.19) | reference 17.109 (bitnet.cpp, I2_S) | **16.86 ± 0.13** (localhost, ctx 512) |
+| Zero/few-shot average | 55.9 (FP16: 57.8) | 54.19 (16 tasks) | — |
+| Energy per token | 0.02–0.06 J (matmul, 7nm est.) | 0.028 J (decode, est.) | see Table 2 (watts) |
+| Non-embedding memory | ~10x smaller than FP16 | 0.4 GB | 1.10 GiB GGUF on disk |
+
+## Table 2 — measured CPU inference benchmark (BitNet b1.58 2B-4T I2_S, this fork)
+
+| Metric | localhost: AMD Ryzen 7 5700X (8C/16T) | server1: AMD Threadripper 3960X (24C/48T) |
+|---|---|---|
+| Prefill pp512, tok/s | 270.3 | 246.3 |
+| Generation tg128, tok/s | 18.7 | 9.9 (48 threads) |
+| Avg package power (RAPL) | 66.1 W | 195.3 W |
+| Benchmark wall time | 2m 43s | 3m 40s |
+| Max adequate context (needle probe) | 4096 (hard limit of the model) | 4096 |
+| Max adequate generation (repetition probe) | >= 1024 tokens (ratio 0.000) | >= 1024 tokens (ratio <= 0.019) |
+| Perplexity wikitext-2 (ctx 512) | 16.86 ± 0.13 | 16.86 ± 0.13 (bit-identical) |
+
+Note: on the 24-core Threadripper token generation is memory-bandwidth bound,
+so more threads do not help. All runs: `-ngl 0`, temp 0.6,
+GGUF sha256-pinned (see manifest), build pinned to
+`RepnikovPavel/llama.cpp@bitnet-ffn-relu2-fix`.
+
+Paper-reference speeds (bitnet.cpp papers 3/5, ternary, decoding tok/s):
+700M: 119.1 (i7-13700H) / 194.4 (M2 Ultra); 7B: 18.8 / 52.4; 13B: 11.0 / 33.8;
+speedup vs llama.cpp FP16: 2.37x-6.17x (x86), 1.37x-5.07x (ARM).
+
+
+---
+
 ```sh
 ocrc parse https://arxiv.org/pdf/2310.11453 --out /home/user/bitnetseries/1 && \
 ocrc parse https://arxiv.org/pdf/2402.17764 --out /home/user/bitnetseries/2 && \
