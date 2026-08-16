@@ -7,6 +7,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p results
+BENCH_T0=$SECONDS
 
 BUILD_DIR="${1:-build}"
 [[ -x "$BUILD_DIR/bin/llama-cli" ]] || BUILD_DIR=build-docker
@@ -58,7 +59,7 @@ build, model, threads, out = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 def gen(prompt, n, ctx):
     r = subprocess.run([f"{build}/bin/llama-cli", "-m", model, "-p", prompt,
                         "-n", str(n), "-t", threads, "--temp", "0.6",
-                        "-ngl", "0", "-c", str(ctx)],
+                        "-ngl", "0", "-c", str(ctx), "-st"],
                        capture_output=True, text=True, timeout=3600)
     return r.stdout
 
@@ -81,4 +82,6 @@ with open(out, "a") as f:
     f.write("\n" + "\n".join(lines) + "\n")
 EOF
 
+WALL=$((SECONDS - BENCH_T0))
+echo "benchmark wall time: $((WALL / 60))m $((WALL % 60))s" | tee -a "$OUT"
 echo "saved: $OUT"

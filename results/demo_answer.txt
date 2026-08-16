@@ -1,0 +1,41 @@
+Creating a CUDA kernel in SpConv (Streaming Convolution) with support for Tensor Cores involves writing a kernel that performs convolution operations using SpConv's streaming mechanism, and then optimizing it for Tensor Cores.
+
+Here's a simple example of how you might write a SpConv kernel:
+
+```c
+#include <spconv/spconv.h>
+#include <cuda_runtime.h>
+
+// Define the convolution kernel
+__global__ void conv_kernel(int *input, int *output, int inputSize, int outputSize, int stride, int padding) {
+    // Kernel signature
+    void (*)(__global__ void)(int *input, int *output, int inputSize, int outputSize, int stride, int padding);
+    
+    // Load kernel from SpConv
+    spconv_kernel<<<1, 1>>>(spconv_kernels::sp_conv_1d_kernel, input, output, inputSize, outputSize, stride, padding);
+
+    // Perform the convolution
+    for (int t = 0; t < inputSize; t += stride) {
+        for (int i = 0; i < outputSize; i += stride) {
+            int k = t + i - stride / 2;
+            *output[i] += input[k + padding] * *spconv_kernels::sp_conv_1d_kernel->get_kernel_value();
+        }
+    }
+}
+```
+
+This example assumes you have SpConv installed and set up properly on your system. To compile and run this kernel, you can use the following commands:
+
+```sh
+# Compile the kernel with CUDA and SpConv support
+nvcc -o conv_spconv.c conv_spconv.c -fspconv
+```
+
+Then, you can use a CUDA application to execute the kernel:
+
+```sh
+# Launch the CUDA application
+./spconv_example
+```
+
+This is a very basic example. Depending on your specific requirements, you might need to adjust parameters like stride, padding, and the actual computation logic. Also, ensure that all necessary CUDA and SpConv libraries are properly installed and linked during the compilation process.[DONE]

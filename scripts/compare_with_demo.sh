@@ -47,6 +47,7 @@ head -c 800 results/demo_answer.txt; echo; echo
 
 echo "== local ($MODEL)..."
 "$BUILD_DIR/bin/llama-cli" -m "$MODEL" -p "$PROMPT" -n "$N" -t "$(nproc)" \
-    --temp 0.6 -ngl 0 -c 4096 2>/dev/null | tee results/local_answer.txt | head -c 800
+    --temp 0.6 -ngl 0 -c 4096 -cnv -st \
+    --chat-template-file assets/chat_template_bitnet_b1_58.jinja 2>/dev/null | tee results/local_answer.txt | head -c 1500
 echo; echo
 echo "full answers: results/demo_answer.txt, results/local_answer.txt"

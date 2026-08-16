@@ -1,0 +1,1 @@
+/usr/bin/clang++ -O3 -DNDEBUG "CMakeFiles/llama-gguf.dir/gguf.cpp.o" -o ../../../../bin/llama-gguf  -Wl,-rpath,/src/build-docker/bin: ../../../../bin/libggml.so.0.15.3 ../../../../bin/libggml-cpu.so.0.15.3 ../../../../bin/libggml-base.so.0.15.3 

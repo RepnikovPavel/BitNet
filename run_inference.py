@@ -33,6 +33,12 @@ def run_inference():
     ]
     if args.conversation:
         command.append("-cnv")
+        # the template embedded in the GGUF is broken ("Human: ... BITNETAssistant: <eos>"
+        # appends EOS before the assistant turn); use the official HF chat template
+        template = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "assets", "chat_template_bitnet_b1_58.jinja")
+        if os.path.exists(template):
+            command += ["--chat-template-file", template]
     # the new llama-cli enables interactive mode whenever a chat template is
     # present and then busy-loops on stdin EOF; --single-turn makes the
     # classic one-shot `run_inference.py -p ...` invocation terminate
@@ -47,7 +53,7 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
     # Usage: python run_inference.py -p "Microsoft Corporation is an American multinational corporation and technology company headquartered in Redmond, Washington."
     parser = argparse.ArgumentParser(description='Run inference')
-    parser.add_argument("-m", "--model", type=str, help="Path to model file", required=False, default="models/bitnet_b1_58-3B/ggml-model-i2_s.gguf")
+    parser.add_argument("-m", "--model", type=str, help="Path to model file", required=False, default="models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf")
     parser.add_argument("-n", "--n-predict", type=int, help="Number of tokens to predict when generating text", required=False, default=128)
     parser.add_argument("-p", "--prompt", type=str, help="Prompt to generate text from", required=True)
     parser.add_argument("-t", "--threads", type=int, help="Number of threads to use", required=False, default=2)
