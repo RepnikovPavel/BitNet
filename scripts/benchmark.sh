@@ -32,7 +32,7 @@ GEN_TOKENS=256
 PROMPT="A large language model is"
 E0="$(rapl_read)"
 T0=$(date +%s.%N)
-LOG=$("$BUILD_DIR/bin/llama-cli" -m "$MODEL" -p "$PROMPT" -n "$GEN_TOKENS" -t "$NTHREADS" --temp 0.6 -ngl 0 -c 4096 2>&1)
+LOG=$("$BUILD_DIR/bin/llama-cli" -m "$MODEL" -p "$PROMPT" -n "$GEN_TOKENS" -t "$NTHREADS" --temp 0.6 -ngl 0 -c 4096 -st 2>&1)
 T1=$(date +%s.%N)
 E1="$(rapl_read)"
 echo "$LOG" > "results/bench_gen_${HOST}.log"
