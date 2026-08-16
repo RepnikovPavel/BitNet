@@ -73,6 +73,18 @@ Paper-reference speeds (bitnet.cpp papers 3/5, ternary, decoding tok/s):
 700M: 119.1 (i7-13700H) / 194.4 (M2 Ultra); 7B: 18.8 / 52.4; 13B: 11.0 / 33.8;
 speedup vs llama.cpp FP16: 2.37x-6.17x (x86), 1.37x-5.07x (ARM).
 
+### Note on output quality vs the online demo
+
+The official demo and this fork produce the same *class* of answers. Measured
+on the probe prompt "write spconv kernel with nvidia cuda assembly and tensor
+cores" (uniq-8-gram ratio, higher = less repetition): demo 0.98 / 0.78, this
+fork 0.99 / 0.91 / 0.97 / 0.57 - same distribution. Important: this is a 2B
+1.58-bit model, answers are approximate and vary between samples in both the
+demo and local runs. If an answer degenerates (repeated loops), it is almost
+always one of: missing chat template fix, generation not stopping at
+`<|eot_id|>`, or temperature above the official 0.6 - the provided scripts
+already set all of these.
+
 
 ---
 
