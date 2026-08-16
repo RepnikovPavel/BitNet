@@ -6,9 +6,9 @@
 #   scripts/chat_ternary.sh ["prompt"]     # without prompt: interactive chat
 set -euo pipefail
 cd "$(dirname "$0")/.."
+source scripts/common.sh
 
-MODEL="models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf"
-[[ -f "$MODEL" ]] || MODEL=/mnt/nvme/bitnetmodels/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf
+MODEL="$BITNET_MODEL"
 [[ -f "$MODEL" ]] || { echo "model not found; run scripts/download_data.sh" >&2; exit 1; }
 
 CLI=build/bin/llama-cli

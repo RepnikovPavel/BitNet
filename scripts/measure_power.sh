@@ -5,12 +5,12 @@
 #   scripts/measure_power.sh [build_dir] [n_tokens]
 set -euo pipefail
 cd "$(dirname "$0")/.."
+source scripts/common.sh
 
 BUILD_DIR="${1:-build}"
 [[ -x "$BUILD_DIR/bin/llama-cli" ]] || BUILD_DIR=build-docker
 N="${2:-256}"
-MODEL="$(ls models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf 2>/dev/null || true)"
-[[ -n "$MODEL" ]] || MODEL=/mnt/nvme/bitnetmodels/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf
+MODEL="$BITNET_MODEL"
 
 RAPL=/sys/class/powercap/intel-rapl:0/energy_uj
 [[ -r "$RAPL" ]] || { echo "RAPL unreadable; run as root or via scripts/docker_run.sh" >&2; exit 1; }

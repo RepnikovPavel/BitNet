@@ -8,24 +8,29 @@
 > `RepnikovPavel/llama.cpp@bitnet-ffn-relu2-fix`. All pins (code, weights,
 > test data, sha256) are in [manifests/weights.json](manifests/weights.json).
 
-One button per task (Docker, `/mnt` from the host is mounted into the container):
+One button per task (Docker, `/mnt` from the host is mounted into the container).
+Models and test data never live in the project dir: weights go to
+`/mnt/nvme/bitnetmodels/`, test data to `/mnt/nvme/bitnetdata/`
+(override with `BITNET_MODELS_DIR` / `BITNET_DATA_DIR`).
 
 ```sh
-# --- container lifecycle ---
+# --- 1. data first ---
+scripts/download_data.sh        # pinned weights + wikitext-2 test set (sha256-verified)
+
+# --- 2. build ---
 scripts/container_start.sh      # start the persistent dev container (bitnet-dev)
 scripts/container_attach.sh     # attach an interactive shell to it
 scripts/build.sh                # build / rebuild: inside the attached container it
                                 #   rebuilds incrementally; outside it uses Docker;
                                 #   scripts/build.sh --local builds on the bare host
 
-# --- chat with the model ---
+# --- 3. chat with the model ---
 scripts/chat_ternary.sh         # interactive chat, ternary BitNet b1.58 2B-4T
 scripts/chat_ternary.sh "hi"    # one-shot question
 scripts/chat_binary.sh          # chat with a binary 1-bit model from
-                                #   models/binary/*.gguf (see note below)
+                                #   /mnt/nvme/bitnetmodels/binary/*.gguf (see note)
 
-# --- data / tests / benchmarks ---
-scripts/download_data.sh        # pinned weights + wikitext-2 test set (sha256-verified)
+# --- tests / benchmarks ---
 scripts/test_accuracy.sh        # perplexity on wikitext-2
 scripts/benchmark.sh            # speed / power / degeneration probes
 scripts/probe_context.sh        # max adequate context probe (needle test)
@@ -35,8 +40,8 @@ scripts/docker_run.sh <cmd>     # run anything inside a throwaway container
 
 Note on binary BitNet: Microsoft never published binary (1-bit) weights -
 all official checkpoints are ternary b1.58. `chat_binary.sh` works as soon as
-you drop a binary BitNet GGUF into `models/binary/`; until then use
-`chat_ternary.sh`. Paper-level binary metrics are in Table 1 below.
+you drop a binary BitNet GGUF into `/mnt/nvme/bitnetmodels/binary/`; until
+then use `chat_ternary.sh`. Paper-level binary metrics are in Table 1 below.
 
 ## Table 1 — model quality metrics (BitNet b1.58 2B-4T, ternary; binary BitNet from the papers)
 

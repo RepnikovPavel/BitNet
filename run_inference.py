@@ -53,7 +53,7 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
     # Usage: python run_inference.py -p "Microsoft Corporation is an American multinational corporation and technology company headquartered in Redmond, Washington."
     parser = argparse.ArgumentParser(description='Run inference')
-    parser.add_argument("-m", "--model", type=str, help="Path to model file", required=False, default="models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf")
+    parser.add_argument("-m", "--model", type=str, help="Path to model file", required=False, default="/mnt/nvme/bitnetmodels/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf")
     parser.add_argument("-n", "--n-predict", type=int, help="Number of tokens to predict when generating text", required=False, default=128)
     parser.add_argument("-p", "--prompt", type=str, help="Prompt to generate text from", required=True)
     parser.add_argument("-t", "--threads", type=int, help="Number of threads to use", required=False, default=2)

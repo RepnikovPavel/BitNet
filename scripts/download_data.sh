@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 # One-button download of all pinned data: model weights + accuracy test set.
 # Every file is verified against manifests/weights.json (size + sha256).
+# Models go to $BITNET_MODELS_DIR (default /mnt/nvme/bitnetmodels),
+# test data to $BITNET_DATA_DIR (default /mnt/nvme/bitnetdata) - never into
+# the project directory.
 #
 #   scripts/download_data.sh
-#
-# Override the model directory with BITNET_MODELS_DIR (default: ./models).
 set -euo pipefail
 cd "$(dirname "$0")/.."
+source scripts/common.sh
 
 MANIFEST=manifests/weights.json
-MODELS_DIR="${BITNET_MODELS_DIR:-models}"
 
 read -r W_URL W_FILE W_SIZE W_SHA <<<"$(python3 - "$MANIFEST" <<'EOF'
 import json, sys
@@ -30,9 +31,9 @@ check() { # path size sha256
     echo "$3  $1" | sha256sum -c - >/dev/null 2>&1
 }
 
-MODEL_DIR="$MODELS_DIR/BitNet-b1.58-2B-4T"
+MODEL_DIR="$BITNET_MODELS_DIR/BitNet-b1.58-2B-4T"
 MODEL_PATH="$MODEL_DIR/$W_FILE"
-mkdir -p "$MODEL_DIR" data
+mkdir -p "$MODEL_DIR" "$BITNET_DATA_DIR"
 
 if check "$MODEL_PATH" "$W_SIZE" "$W_SHA"; then
     echo "weights OK (pinned revision, sha256 verified): $MODEL_PATH"
@@ -44,7 +45,8 @@ else
     echo "weights OK (sha256 verified)"
 fi
 
-PARQUET=data/wikitext-2-test.parquet
+PARQUET="$BITNET_DATA_DIR/wikitext-2-test.parquet"
+RAW="$BITNET_DATA_DIR/wiki.test.raw"
 if check "$PARQUET" "$T_SIZE" "$T_SHA"; then
     echo "test data OK (sha256 verified): $PARQUET"
 else
@@ -56,8 +58,8 @@ else
 fi
 
 # convert parquet -> plain text for llama-perplexity
-if [[ ! -s data/wiki.test.raw ]]; then
-    python3 scripts/parquet_to_raw.py "$PARQUET" data/wiki.test.raw
+if [[ ! -s "$RAW" ]]; then
+    python3 scripts/parquet_to_raw.py "$PARQUET" "$RAW"
 fi
-echo "raw text OK: data/wiki.test.raw"
+echo "raw text OK: $RAW"
 echo "DONE"

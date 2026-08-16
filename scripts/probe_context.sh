@@ -6,12 +6,12 @@
 #   scripts/probe_context.sh [build_dir]
 set -euo pipefail
 cd "$(dirname "$0")/.."
+source scripts/common.sh
 mkdir -p results
 
 BUILD_DIR="${1:-build}"
 [[ -x "$BUILD_DIR/bin/llama-cli" ]] || BUILD_DIR=build-docker
-MODEL="$(ls models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf 2>/dev/null || true)"
-[[ -n "$MODEL" ]] || MODEL=/mnt/nvme/bitnetmodels/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf
+MODEL="$BITNET_MODEL"
 
 python3 - "$BUILD_DIR" "$MODEL" <<'EOF'
 import subprocess, sys

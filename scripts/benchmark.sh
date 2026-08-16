@@ -6,6 +6,7 @@
 #   scripts/benchmark.sh [build_dir]
 set -euo pipefail
 cd "$(dirname "$0")/.."
+source scripts/common.sh
 mkdir -p results
 BENCH_T0=$SECONDS
 
@@ -13,8 +14,7 @@ BUILD_DIR="${1:-build}"
 [[ -x "$BUILD_DIR/bin/llama-cli" ]] || BUILD_DIR=build-docker
 [[ -x "$BUILD_DIR/bin/llama-cli" ]] || { echo "no build found; run scripts/build.sh first" >&2; exit 1; }
 
-MODEL="$(ls models/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf 2>/dev/null || true)"
-[[ -n "$MODEL" ]] || MODEL=/mnt/nvme/bitnetmodels/BitNet-b1.58-2B-4T/ggml-model-i2_s.gguf
+MODEL="$BITNET_MODEL"
 [[ -f "$MODEL" ]] || { echo "model not found; run scripts/download_data.sh first" >&2; exit 1; }
 
 HOST="$(hostname)"
