@@ -18,15 +18,21 @@ CMAKE_FLAGS=(
     -DLLAMA_BUILD_COMMON=ON
 )
 
-if [[ "${1:-}" == "--local" ]]; then
-    cmake -S . -B build "${CMAKE_FLAGS[@]}"
-    cmake --build build -j "$(nproc)"
-    echo "OK: build/bin/llama-cli"
+if [[ "${1:-}" == "--local" || -f /.dockerenv ]]; then
+    # host-local build, or we are already inside the dev container
+    # (attach flow: container_start.sh -> container_attach.sh -> build.sh)
+    OUT=build
+    [[ -f /.dockerenv ]] && OUT=build-docker
+    cmake -S . -B "$OUT" "${CMAKE_FLAGS[@]}"
+    cmake --build "$OUT" -j "$(nproc)"
+    echo "OK: $OUT/bin/llama-cli"
     exit 0
 fi
 
 IMAGE=bitnet-cpp:dev
-docker build -t "$IMAGE" -f Dockerfile .
+if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+    docker build -t "$IMAGE" -f Dockerfile .
+fi
 docker run --rm \
     -v "$PWD":/src \
     -v /mnt:/mnt \
