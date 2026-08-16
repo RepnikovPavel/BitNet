@@ -39,6 +39,10 @@ def run_inference():
                                 "assets", "chat_template_bitnet_b1_58.jinja")
         if os.path.exists(template):
             command += ["--chat-template-file", template]
+        # the GGUF registers only 128001 as EOS; the model ends chat turns with
+        # <|eot_id|> (128009, see generation_config.json eos_token_id), so
+        # without this override generation runs on into hallucinated turns
+        command += ["--override-kv", "tokenizer.ggml.eos_token_id=int:128009"]
     # the new llama-cli enables interactive mode whenever a chat template is
     # present and then busy-loops on stdin EOF; --single-turn makes the
     # classic one-shot `run_inference.py -p ...` invocation terminate
@@ -58,7 +62,7 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--prompt", type=str, help="Prompt to generate text from", required=True)
     parser.add_argument("-t", "--threads", type=int, help="Number of threads to use", required=False, default=2)
     parser.add_argument("-c", "--ctx-size", type=int, help="Size of the prompt context", required=False, default=2048)
-    parser.add_argument("-temp", "--temperature", type=float, help="Temperature, a hyperparameter that controls the randomness of the generated text", required=False, default=0.8)
+    parser.add_argument("-temp", "--temperature", type=float, help="Temperature, a hyperparameter that controls the randomness of the generated text", required=False, default=0.6)
     parser.add_argument("-cnv", "--conversation", action='store_true', help="Whether to enable chat mode or not (for instruct models.)")
 
     args = parser.parse_args()
